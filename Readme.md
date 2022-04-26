@@ -1,6 +1,6 @@
 # Проект «Большое путешествие»
 
-* Студент: [Андрей  Иванов](https://up.htmlacademy.ru/ecmascript/17/user/1992879).
+* Студент: [Андрей  Иванов](https://htmlacademy.ru/profile/id1992879).
 * Наставник: [Артём Рудов](https://htmlacademy.ru/profile/artrudov).
 
 ---

@@ -1,7 +1,6 @@
-import InfoView from './view/info-view';
 import { render, RenderPosition } from './render.js';
-import { EventListPresenter } from './presenter/index.js';
-import { FilterView, SortView} from './view/index.js';
+import { EventListPresenter } from './presenter';
+import { InfoView, FilterView, SortView } from './view';
 
 const tripMainBlock = document.querySelector('.trip-main');
 const tripControlsFilter = document.querySelector('.trip-controls__filters');

@@ -1,6 +1,4 @@
-import EventEditView from '../view/event-edit-view';
-import EventItemView from '../view/event-item-view';
-import EventListView from '../view/event-list-view';
+import { EventEditView, EventItemView, EventListView } from '../view';
 import { render } from '../render.js';
 import { NUMBER_OF_EVENTS } from '../constans.js';
 

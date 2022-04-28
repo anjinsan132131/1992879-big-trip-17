@@ -1,8 +1,7 @@
-import FilterView from './view/filter-view';
-import SortView from './view/sort-view';
 import InfoView from './view/info-view';
 import { render, RenderPosition } from './render.js';
-import EventListPresenter from './presenter/event-list-presenter.js';
+import { EventListPresenter } from './presenter/index.js';
+import { FilterView, SortView} from './view/index.js';
 
 const tripMainBlock = document.querySelector('.trip-main');
 const tripControlsFilter = document.querySelector('.trip-controls__filters');

@@ -1,7 +1,5 @@
 import { EventEditView, EventItemView, EventListView } from '../view';
 import { render } from '../render.js';
-// import { NUMBER_OF_EVENTS } from '../constans.js';
-
 export default class EventListPresenter {
   eventListComponent = new EventListView();
 

@@ -1,8 +1,9 @@
 import dayjs from 'dayjs';
 import { createElement } from '../render.js';
 import { getDurationTime } from '../util.js';
+import { OFFERS_LIST } from '../mock/offers.js';
 
-const createService = (services) => services.map(({title, price}) => (
+const createOffers = (offers) => offers.map(({title, price}) => (
   `<li class="event__offer">
       <span class="event__offer-title">${title}</span> &plus;&euro;&nbsp;<span class="event__offer-price">${price}</span>
     </li>`)).join('');
@@ -17,7 +18,8 @@ const createEventItemTemplate = (event) => {
     ? 'event__favorite-btn--active'
     : '';
 
-  const servicesList = createService(offers);
+  const offersList = OFFERS_LIST.find((offer) => offer.type === type).offers.filter(({id}) => offers.includes(id));
+  const servicesList = createOffers(offersList);
 
   const startDate = dayjs(dateFrom).format('MMM D');
   const timeStart = dayjs(dateFrom).format('H:mm');

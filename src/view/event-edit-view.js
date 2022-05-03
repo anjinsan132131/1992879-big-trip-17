@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import { createElement } from '../render.js';
 import { POINT_TYPE, CITY_NAME } from '../constans.js';
+import { OFFERS_LIST } from '../mock/offers.js';
 
 const createOfferPhotos = (photos) => photos.map(({src, description}) => (
   `<img class="event__photo" src="${src}" alt="${description}">`)).join('');
@@ -14,8 +15,22 @@ const createEventTypes = () => POINT_TYPE.map((type) => (
 const createEventCity = () => CITY_NAME.map((city) => (
   `<option value="${city}"></option>`)).join('');
 
+const createOffers = (allOffersForType, currentOffersList) => allOffersForType.offers.map(({id, title, price}) => {
+  const checked = currentOffersList.includes(id) ? 'checked' : '';
+  return (
+    ` <div class="event__offer-selector">
+    <input class="event__offer-checkbox  visually-hidden" id="event-offer-${title}-1" type="checkbox" name="event-offer-${title}" ${checked}>
+    <label class="event__offer-label" for="event-offer-${title}-1">
+      <span class="event__offer-title">${title}</span>
+      &plus;&euro;&nbsp;
+      <span class="event__offer-price">${price}</span>
+    </label>
+  </div>`
+  );
+}).join('');
+
 const createEventEditTemplate = (event) => {
-  const { destination, basePrice, dateFrom, dateTo, type } = event;
+  const { destination, basePrice, dateFrom, dateTo, type, offers } = event;
   const { description, pictures, name } = destination;
 
   const startDate = dayjs(dateFrom).format('D/MM/YY HH:mm');
@@ -24,6 +39,9 @@ const createEventEditTemplate = (event) => {
   const photoList = createOfferPhotos(pictures);
   const eventTypeList = createEventTypes();
   const eventCityList = createEventCity();
+
+  const allOffersForType = OFFERS_LIST.find((offer) => offer.type === type);
+  const offersList = createOffers(allOffersForType, offers);
 
   return (
     `<li class="trip-events__item">
@@ -73,6 +91,15 @@ const createEventEditTemplate = (event) => {
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Cancel</button>
       </header>
+      ${offersList.length > 0 ?
+      `<section class="event__details">
+      <section class="event__section  event__section--offers">
+        <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+        <div class="event__available-offers">
+        ${offersList}
+        </div>
+      </section>` : ''}
+
 
       ${description.length > 0 ?
       `<section class="event__details">

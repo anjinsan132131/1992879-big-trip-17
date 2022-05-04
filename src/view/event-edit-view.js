@@ -4,19 +4,23 @@ import { POINT_TYPE, CITY_NAME } from '../constans.js';
 import { OFFERS_LIST } from '../mock/offers.js';
 
 const createOfferPhotos = (photos) => photos.map(({src, description}) => (
-  `<img class="event__photo" src="${src}" alt="${description}">`)).join('');
+  `<img class="event__photo" src="${src}" alt="${description}">`
+)).join('');
 
 const createEventTypes = () => POINT_TYPE.map((type) => (
   `<div class="event__type-item">
     <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
     <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type}</label>
-  </div>`)).join('');
+  </div>`
+)).join('');
 
 const createEventCity = () => CITY_NAME.map((city) => (
-  `<option value="${city}"></option>`)).join('');
+  `<option value="${city}"></option>`
+)).join('');
 
 const createOffers = (allOffersForType, currentOffersList) => allOffersForType.offers.map(({id, title, price}) => {
   const checked = currentOffersList.includes(id) ? 'checked' : '';
+
   return (
     ` <div class="event__offer-selector">
     <input class="event__offer-checkbox  visually-hidden" id="event-offer-${title}-1" type="checkbox" name="event-offer-${title}" ${checked}>

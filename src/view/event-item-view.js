@@ -6,7 +6,8 @@ import { OFFERS_LIST } from '../mock/offers.js';
 const createOffers = (offers) => offers.map(({title, price}) => (
   `<li class="event__offer">
       <span class="event__offer-title">${title}</span> &plus;&euro;&nbsp;<span class="event__offer-price">${price}</span>
-    </li>`)).join('');
+    </li>`
+)).join('');
 
 const createEventItemTemplate = (event) => {
 
@@ -26,7 +27,6 @@ const createEventItemTemplate = (event) => {
   const timeEnd = dayjs(dateTo).format('H:mm');
 
   const timeDuration = getDurationTime(dayjs(dateTo).diff(dayjs(dateFrom)));
-
 
   return (`<li class="trip-events__item">
     <div class="event">

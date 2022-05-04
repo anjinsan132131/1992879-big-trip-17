@@ -33,3 +33,8 @@ export const POINT_TYPE = [
   'sightseeing',
   'restaurant'
 ];
+
+export const EVENT_LIST_CLASS_CONSTANTS = {
+  EVENT_ROLLUP_BUTTON: 'event__rollup-btn',
+  EVENT_EDIT: 'event--edit'
+};

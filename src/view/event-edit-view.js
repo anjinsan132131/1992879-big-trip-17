@@ -94,6 +94,9 @@ const createEventEditTemplate = (event) => {
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Cancel</button>
+        <button class="event__rollup-btn" type="button">
+          <span class="visually-hidden">Open event</span>
+        </button>
       </header>
       ${offersList.length > 0 ?
       `<section class="event__details">
@@ -124,23 +127,26 @@ const createEventEditTemplate = (event) => {
 };
 
 export default class EventEditView {
+  #element = null;
+  #event = null;
+
   constructor(event) {
-    this.event = event;
+    this.#event = event;
   }
 
-  getTemplate() {
-    return createEventEditTemplate(this.event);
+  get template() {
+    return createEventEditTemplate(this.#event);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

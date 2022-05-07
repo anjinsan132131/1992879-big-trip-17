@@ -23,7 +23,7 @@ export const generatePoint = () => {
         }
       ]
     },
-    id: 1,
+    id: Math.floor(new Date().valueOf() * Math.random()).toString(),
     isFavorite: true,
     offers: [2],
     type: pointType

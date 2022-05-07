@@ -1,11 +1,13 @@
 import { EventEditView, EventItemView, EventListView } from '../view';
 import { render } from '../render.js';
-import { EVENT_LIST_CLASS_CONSTANTS } from '../constans.js';
+import { EventSelector } from '../constans.js';
 
 export default class EventListPresenter {
   #eventListContainer = null;
   #pointsModel = null;
   #pointList = [];
+  #oldEventPoint = null;
+  #oldEventEdit = null;
 
   #eventListComponent = new EventListView();
 
@@ -30,6 +32,8 @@ export default class EventListPresenter {
     };
 
     const replaceEventEditToPoint = () => {
+      this.#oldEventPoint = null;
+      this.#oldEventEdit = null;
       this.#eventListComponent.element.replaceChild(pointComponent.element, eventEditComponent.element);
     };
 
@@ -41,18 +45,26 @@ export default class EventListPresenter {
       }
     };
 
-    pointComponent.element.querySelector(`.${EVENT_LIST_CLASS_CONSTANTS.EVENT_ROLLUP_BUTTON}`).addEventListener('click', () => {
+    pointComponent.element.querySelector(`.${EventSelector.ROLLUP}`).addEventListener('click', () => {
+      if (this.#oldEventEdit && this.#oldEventPoint) {
+        this.#eventListComponent.element.replaceChild(this.#oldEventPoint.element, this.#oldEventEdit.element);
+      }
+      this.#oldEventPoint = pointComponent;
+      this.#oldEventEdit = eventEditComponent;
+
       replacePointToEventEdit();
       document.addEventListener('keydown', onEscKeyDown);
     });
 
-    eventEditComponent.element.querySelector(`.${EVENT_LIST_CLASS_CONSTANTS.EVENT_ROLLUP_BUTTON}`).addEventListener('click', () => {
+    eventEditComponent.element.querySelector(`.${EventSelector.ROLLUP}`).addEventListener('click', () => {
       replaceEventEditToPoint();
+      document.removeEventListener('keydown', onEscKeyDown);
     });
 
-    eventEditComponent.element.querySelector(`.${EVENT_LIST_CLASS_CONSTANTS.EVENT_EDIT}`).addEventListener('submit', (event) => {
+    eventEditComponent.element.querySelector(`.${EventSelector.EDIT}`).addEventListener('submit', (event) => {
       event.preventDefault();
       replaceEventEditToPoint();
+      document.removeEventListener('keydown', onEscKeyDown);
     });
 
     render(pointComponent, this.#eventListComponent.element);

@@ -1,6 +1,9 @@
-import { EventEditView, EventItemView, EventListView } from '../view';
-import { render } from '../render.js';
+import { EventEditView, EventItemView, EventListView, ListEmptyView, InfoView, SortView  } from '../view';
+import { render, RenderPosition } from '../render.js';
 import { EventSelector } from '../constans.js';
+
+const tripMainBlock = document.querySelector('.trip-main');
+const tripEventsBlock = document.querySelector('.trip-events');
 
 export default class EventListPresenter {
   #eventListContainer = null;
@@ -14,8 +17,17 @@ export default class EventListPresenter {
   init = (container, pointsModel) => {
     this.#eventListContainer = container;
     this.#pointsModel = pointsModel;
-    this.#pointList  = [...this.#pointsModel.points];
+    // this.#pointList  = [];
+    this.#pointList = [...this.#pointsModel.points];
 
+    const listEmptyComponent = new ListEmptyView('Everything');
+    if (!this.#pointList.length) {
+      render(listEmptyComponent, this.#eventListContainer);
+      return;
+    }
+
+    render(new InfoView(), tripMainBlock, RenderPosition.AFTERBEGIN);
+    render(new SortView(), tripEventsBlock);
     render(this.#eventListComponent, this.#eventListContainer);
 
     for (let i = 0; i < this.#pointList.length; i++) {

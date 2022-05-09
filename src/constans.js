@@ -38,3 +38,15 @@ export const EventSelector = {
   ROLLUP: 'event__rollup-btn',
   EDIT: 'event--edit'
 };
+
+export const ListEmptyMessages = {
+  EVERYTHING: 'Click New Event to create your first point',
+  PAST: 'There are no past events now',
+  FUTURE: 'There are no future events now'
+};
+
+export const FilterValue = {
+  Everything: 'EVERYTHING',
+  Past: 'PAST',
+  Future: 'FUTURE'
+};

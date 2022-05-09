@@ -4,3 +4,4 @@ export { default as SortView } from './sort-view.js';
 export { default as EventEditView } from './event-edit-view.js';
 export { default as EventItemView } from './event-item-view.js';
 export { default as EventListView } from './event-list-view.js';
+export { default as ListEmptyView } from  './list-empty-view.js';

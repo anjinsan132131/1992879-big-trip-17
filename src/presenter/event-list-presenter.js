@@ -1,21 +1,32 @@
-import { EventEditView, EventItemView, EventListView } from '../view';
-import { render } from '../render.js';
+import { EventEditView, EventItemView, EventListView, ListEmptyView, InfoView, SortView  } from '../view';
+import { render, RenderPosition } from '../render.js';
 import { EventSelector } from '../constans.js';
+
+const tripMainBlock = document.querySelector('.trip-main');
+const tripEventsBlock = document.querySelector('.trip-events');
 
 export default class EventListPresenter {
   #eventListContainer = null;
   #pointsModel = null;
   #pointList = [];
-  #oldEventPoint = null;
-  #oldEventEdit = null;
+  #isOpen = false;
 
   #eventListComponent = new EventListView();
 
   init = (container, pointsModel) => {
     this.#eventListContainer = container;
     this.#pointsModel = pointsModel;
-    this.#pointList  = [...this.#pointsModel.points];
+    // this.#pointList  = [];
+    this.#pointList = [...this.#pointsModel.points];
 
+    const listEmptyComponent = new ListEmptyView('Everything');
+    if (!this.#pointList.length) {
+      render(listEmptyComponent, this.#eventListContainer);
+      return;
+    }
+
+    render(new InfoView(), tripMainBlock, RenderPosition.AFTERBEGIN);
+    render(new SortView(), tripEventsBlock);
     render(this.#eventListComponent, this.#eventListContainer);
 
     for (let i = 0; i < this.#pointList.length; i++) {
@@ -32,8 +43,7 @@ export default class EventListPresenter {
     };
 
     const replaceEventEditToPoint = () => {
-      this.#oldEventPoint = null;
-      this.#oldEventEdit = null;
+      this.#isOpen = false;
       this.#eventListComponent.element.replaceChild(pointComponent.element, eventEditComponent.element);
     };
 
@@ -46,11 +56,11 @@ export default class EventListPresenter {
     };
 
     pointComponent.element.querySelector(`.${EventSelector.ROLLUP}`).addEventListener('click', () => {
-      if (this.#oldEventEdit && this.#oldEventPoint) {
-        this.#eventListComponent.element.replaceChild(this.#oldEventPoint.element, this.#oldEventEdit.element);
+      if (this.#isOpen) {
+        return;
       }
-      this.#oldEventPoint = pointComponent;
-      this.#oldEventEdit = eventEditComponent;
+
+      this.#isOpen = true;
 
       replacePointToEventEdit();
       document.addEventListener('keydown', onEscKeyDown);

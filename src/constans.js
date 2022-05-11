@@ -33,3 +33,8 @@ export const POINT_TYPE = [
   'sightseeing',
   'restaurant'
 ];
+
+export const EventSelector = {
+  ROLLUP: 'event__rollup-btn',
+  EDIT: 'event--edit'
+};

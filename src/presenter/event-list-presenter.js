@@ -9,8 +9,7 @@ export default class EventListPresenter {
   #eventListContainer = null;
   #pointsModel = null;
   #pointList = [];
-  #oldEventPoint = null;
-  #oldEventEdit = null;
+  #isOpen = false;
 
   #eventListComponent = new EventListView();
 
@@ -44,8 +43,7 @@ export default class EventListPresenter {
     };
 
     const replaceEventEditToPoint = () => {
-      this.#oldEventPoint = null;
-      this.#oldEventEdit = null;
+      this.#isOpen = false;
       this.#eventListComponent.element.replaceChild(pointComponent.element, eventEditComponent.element);
     };
 
@@ -58,11 +56,11 @@ export default class EventListPresenter {
     };
 
     pointComponent.element.querySelector(`.${EventSelector.ROLLUP}`).addEventListener('click', () => {
-      if (this.#oldEventEdit && this.#oldEventPoint) {
-        this.#eventListComponent.element.replaceChild(this.#oldEventPoint.element, this.#oldEventEdit.element);
+      if (this.#isOpen) {
+        return;
       }
-      this.#oldEventPoint = pointComponent;
-      this.#oldEventEdit = eventEditComponent;
+
+      this.#isOpen = true;
 
       replacePointToEventEdit();
       document.addEventListener('keydown', onEscKeyDown);

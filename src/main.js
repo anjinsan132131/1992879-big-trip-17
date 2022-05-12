@@ -1,4 +1,4 @@
-import { render } from './render.js';
+import { render } from './framework/render.js';
 import { EventListPresenter } from './presenter';
 import { FilterView } from './view';
 import PointsModel from './model/point-model.js';

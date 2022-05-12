@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
-import { createElement } from '../render.js';
-import { POINT_TYPE, CITY_NAME } from '../constans.js';
+import AbstractView from '../framework/view/abstract-view.js';
+import { POINT_TYPE, CITY_NAME, EventSelector } from '../constans.js';
 import { OFFERS_LIST } from '../mock/offers.js';
 
 const createOfferPhotos = (photos) => photos.map(({src, description}) => (
@@ -126,11 +126,11 @@ const createEventEditTemplate = (event) => {
   );
 };
 
-export default class EventEditView {
-  #element = null;
+export default class EventEditView extends AbstractView {
   #event = null;
 
   constructor(event) {
+    super();
     this.#event = event;
   }
 
@@ -138,15 +138,23 @@ export default class EventEditView {
     return createEventEditTemplate(this.#event);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setEditClickHandler = (callback) => {
+    this._callback.editClick = callback;
+    this.element.querySelector(`.${EventSelector.ROLLUP}`).addEventListener('click', this.#editClickHandler);
+  };
 
-    return this.#element;
-  }
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.editClick();
+  };
 
-  removeElement() {
-    this.#element = null;
-  }
+  setFormSubmitHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.querySelector(`.${EventSelector.EDIT}`).addEventListener('submit', this.#formSubmitHandler);
+  };
+
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  };
 }

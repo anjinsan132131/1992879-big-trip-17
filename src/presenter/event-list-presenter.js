@@ -1,6 +1,5 @@
 import { EventEditView, EventItemView, EventListView, ListEmptyView, InfoView, SortView  } from '../view';
-import { render, RenderPosition } from '../render.js';
-import { EventSelector } from '../constans.js';
+import { render, RenderPosition, replace } from '../framework/render.js';
 
 const tripMainBlock = document.querySelector('.trip-main');
 const tripEventsBlock = document.querySelector('.trip-events');
@@ -39,12 +38,12 @@ export default class EventListPresenter {
     const eventEditComponent = new EventEditView(point);
 
     const replacePointToEventEdit = () => {
-      this.#eventListComponent.element.replaceChild(eventEditComponent.element, pointComponent.element);
+      replace(eventEditComponent, pointComponent);
     };
 
     const replaceEventEditToPoint = () => {
       this.#isOpen = false;
-      this.#eventListComponent.element.replaceChild(pointComponent.element, eventEditComponent.element);
+      replace(pointComponent, eventEditComponent);
     };
 
     const onEscKeyDown = (event) => {
@@ -55,7 +54,7 @@ export default class EventListPresenter {
       }
     };
 
-    pointComponent.element.querySelector(`.${EventSelector.ROLLUP}`).addEventListener('click', () => {
+    pointComponent.setClickHandler(() => {
       if (this.#isOpen) {
         return;
       }
@@ -66,13 +65,12 @@ export default class EventListPresenter {
       document.addEventListener('keydown', onEscKeyDown);
     });
 
-    eventEditComponent.element.querySelector(`.${EventSelector.ROLLUP}`).addEventListener('click', () => {
+    eventEditComponent.setEditClickHandler(() => {
       replaceEventEditToPoint();
       document.removeEventListener('keydown', onEscKeyDown);
     });
 
-    eventEditComponent.element.querySelector(`.${EventSelector.EDIT}`).addEventListener('submit', (event) => {
-      event.preventDefault();
+    eventEditComponent.setFormSubmitHandler(() => {
       replaceEventEditToPoint();
       document.removeEventListener('keydown', onEscKeyDown);
     });

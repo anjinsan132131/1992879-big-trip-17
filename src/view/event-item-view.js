@@ -1,7 +1,8 @@
 import dayjs from 'dayjs';
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { getDurationTime } from '../util.js';
 import { OFFERS_LIST } from '../mock/offers.js';
+import { EventSelector } from '../constans.js';
 
 const createOffers = (offers) => offers.map(({title, price}) => (
   `<li class="event__offer">
@@ -64,11 +65,11 @@ const createEventItemTemplate = (event) => {
   );
 };
 
-export default class EventItemView {
-  #element = null;
+export default class EventItemView extends AbstractView {
   #event = null;
 
   constructor(event) {
+    super();
     this.#event = event;
   }
 
@@ -76,15 +77,13 @@ export default class EventItemView {
     return createEventItemTemplate(this.#event);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector(`.${EventSelector.ROLLUP}`).addEventListener('click', this.#clickHandler);
+  };
 
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }

@@ -40,13 +40,36 @@ export const EventSelector = {
 };
 
 export const ListEmptyMessages = {
-  EVERYTHING: 'Click New Event to create your first point',
-  PAST: 'There are no past events now',
-  FUTURE: 'There are no future events now'
+  Everything: 'Click New Event to create your first point',
+  Past: 'There are no past events now',
+  Future: 'There are no future events now'
 };
 
 export const FilterValue = {
-  Everything: 'EVERYTHING',
-  Past: 'PAST',
-  Future: 'FUTURE'
+  EVERYTHING: 'Everything',
+  PAST: 'Past',
+  FUTURE: 'Future'
 };
+
+export const SortValue = [
+  {
+    name: 'day',
+    isChecked: true
+  },
+  {
+    name: 'event',
+    isChecked: false
+  },
+  {
+    name: 'time',
+    isChecked: false
+  },
+  {
+    name: 'price',
+    isChecked: false
+  },
+  {
+    name: 'offers',
+    isChecked: false
+  }
+];

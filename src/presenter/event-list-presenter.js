@@ -1,5 +1,6 @@
 import { EventEditView, EventItemView, EventListView, ListEmptyView, InfoView, SortView  } from '../view';
 import { render, RenderPosition, replace } from '../framework/render.js';
+import { FilterValue, SortValue } from '../constans.js';
 
 const tripMainBlock = document.querySelector('.trip-main');
 const tripEventsBlock = document.querySelector('.trip-events');
@@ -18,14 +19,14 @@ export default class EventListPresenter {
     // this.#pointList  = [];
     this.#pointList = [...this.#pointsModel.points];
 
-    const listEmptyComponent = new ListEmptyView('Everything');
+    const listEmptyComponent = new ListEmptyView(FilterValue.EVERYTHING);
     if (!this.#pointList.length) {
       render(listEmptyComponent, this.#eventListContainer);
       return;
     }
 
     render(new InfoView(), tripMainBlock, RenderPosition.AFTERBEGIN);
-    render(new SortView(), tripEventsBlock);
+    render(new SortView(SortValue), tripEventsBlock);
     render(this.#eventListComponent, this.#eventListContainer);
 
     for (let i = 0; i < this.#pointList.length; i++) {

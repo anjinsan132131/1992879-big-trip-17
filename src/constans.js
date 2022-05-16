@@ -46,30 +46,9 @@ export const ListEmptyMessages = {
 };
 
 export const FilterValue = {
-  EVERYTHING: 'Everything',
-  PAST: 'Past',
-  FUTURE: 'Future'
+  Everything: 'Everything',
+  Past: 'Past',
+  Future: 'Future'
 };
 
-export const SortValue = [
-  {
-    name: 'day',
-    isChecked: true
-  },
-  {
-    name: 'event',
-    isChecked: false
-  },
-  {
-    name: 'time',
-    isChecked: false
-  },
-  {
-    name: 'price',
-    isChecked: false
-  },
-  {
-    name: 'offers',
-    isChecked: false
-  }
-];
+export const SortValue = ['day', 'event', 'time', 'price', 'offers'];

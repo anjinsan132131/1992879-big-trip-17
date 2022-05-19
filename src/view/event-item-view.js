@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import AbstractView from '../framework/view/abstract-view.js';
-import { getDurationTime } from '../util.js';
+import { getDurationTime } from '../utils/common.js';
 import { OFFERS_LIST } from '../mock/offers.js';
 import { EventSelector } from '../constans.js';
 

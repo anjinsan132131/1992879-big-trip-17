@@ -53,6 +53,13 @@ export const FilterValue = {
 
 export const SortValue = ['day', 'event', 'time', 'price', 'offers'];
 
+export const SortType = {
+  DAY: 'day',
+  TIME: 'time',
+  PRICE: 'price'
+};
+
+
 export const EventMode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING',

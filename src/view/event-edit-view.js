@@ -143,14 +143,14 @@ export default class EventEditView extends AbstractView {
     this.element.querySelector(`.${EventSelector.ROLLUP}`).addEventListener('click', this.#editClickHandler);
   };
 
-  #editClickHandler = (evt) => {
-    evt.preventDefault();
-    this._callback.editClick();
-  };
-
   setFormSubmitHandler = (callback) => {
     this._callback.formSubmit = callback;
     this.element.querySelector(`.${EventSelector.EDIT}`).addEventListener('submit', this.#formSubmitHandler);
+  };
+
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.editClick();
   };
 
   #formSubmitHandler = (evt) => {

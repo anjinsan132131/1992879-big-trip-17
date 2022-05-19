@@ -52,3 +52,9 @@ export const FilterValue = {
 };
 
 export const SortValue = ['day', 'event', 'time', 'price', 'offers'];
+
+export const EventMode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+

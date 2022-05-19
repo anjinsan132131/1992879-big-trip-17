@@ -1,6 +1,8 @@
-import { EventEditView, EventItemView, EventListView, ListEmptyView, InfoView, SortView  } from '../view';
-import { render, RenderPosition, replace } from '../framework/render.js';
+import { EventListView, ListEmptyView, InfoView, SortView  } from '../view';
+import { render, RenderPosition } from '../framework/render.js';
 import { FilterValue, SortValue } from '../constans.js';
+import PointPresenter from './point-presenter';
+import { updateItem } from '../util.js';
 
 const tripMainBlock = document.querySelector('.trip-main');
 const tripEventsBlock = document.querySelector('.trip-events');
@@ -9,17 +11,16 @@ export default class EventListPresenter {
   #eventListContainer = null;
   #pointsModel = null;
   #pointList = [];
-  #isOpen = false;
+  #pointPresenter = new Map();
 
   #eventListComponent = new EventListView();
 
   init = (container, pointsModel) => {
     this.#eventListContainer = container;
     this.#pointsModel = pointsModel;
-    // this.#pointList  = [];
     this.#pointList = [...this.#pointsModel.points];
 
-    const listEmptyComponent = new ListEmptyView(FilterValue.EVERYTHING);
+    const listEmptyComponent = new ListEmptyView(FilterValue.Everything);
     if (!this.#pointList.length) {
       render(listEmptyComponent, this.#eventListContainer);
       return;
@@ -34,48 +35,18 @@ export default class EventListPresenter {
     }
   };
 
+  #handlePointChange = (updatedPoint) => {
+    this.#pointList = updateItem(this.#pointList, updatedPoint);
+    this.#pointPresenter.get(updatedPoint.id).init(updatedPoint);
+  };
+
+  #handleModeChange = () => {
+    this.#pointPresenter.forEach((presenter) => presenter.resetView());
+  };
+
   #renderPoint = (point) => {
-    const pointComponent = new EventItemView(point);
-    const eventEditComponent = new EventEditView(point);
-
-    const replacePointToEventEdit = () => {
-      replace(eventEditComponent, pointComponent);
-    };
-
-    const replaceEventEditToPoint = () => {
-      this.#isOpen = false;
-      replace(pointComponent, eventEditComponent);
-    };
-
-    const onEscKeyDown = (event) => {
-      if (event.key === 'Escape' || event.key === 'Esc') {
-        event.preventDefault();
-        replaceEventEditToPoint();
-        document.removeEventListener('keydown', onEscKeyDown);
-      }
-    };
-
-    pointComponent.setClickHandler(() => {
-      if (this.#isOpen) {
-        return;
-      }
-
-      this.#isOpen = true;
-
-      replacePointToEventEdit();
-      document.addEventListener('keydown', onEscKeyDown);
-    });
-
-    eventEditComponent.setEditClickHandler(() => {
-      replaceEventEditToPoint();
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
-
-    eventEditComponent.setFormSubmitHandler(() => {
-      replaceEventEditToPoint();
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
-
-    render(pointComponent, this.#eventListComponent.element);
+    const pointPresenter = new PointPresenter(this.#eventListComponent.element, this.#handlePointChange, this.#handleModeChange);
+    pointPresenter.init(point);
+    this.#pointPresenter.set(point.id, pointPresenter);
   };
 }

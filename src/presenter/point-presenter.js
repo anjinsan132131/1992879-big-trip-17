@@ -5,6 +5,7 @@ import { EventMode } from '../constans.js';
 
 export default class PointPresenter {
   #point = null;
+  #offers = null;
   #pointComponent = null;
   #eventEditComponent = null;
   #eventListContainer = null;
@@ -18,14 +19,15 @@ export default class PointPresenter {
     this.#changeMode = changeMode;
   }
 
-  init = (point) => {
+  init = (point, offers) => {
     this.#point = point;
+    this.#offers = offers;
 
     const prevPointComponent = this.#pointComponent;
     const prevPointEditComponent = this.#eventEditComponent;
 
-    this.#pointComponent = new EventItemView(point);
-    this.#eventEditComponent = new EventEditView(point);
+    this.#pointComponent = new EventItemView(point, offers);
+    this.#eventEditComponent = new EventEditView(point, offers);
 
     this.#pointComponent.setClickHandler(this.#replacePointToEventEdit);
     this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);

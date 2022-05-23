@@ -29,3 +29,4 @@ export const generatePoint = () => {
     type: pointType
   };
 };
+

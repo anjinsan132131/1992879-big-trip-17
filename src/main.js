@@ -15,3 +15,4 @@ const eventListPresenter = new EventListPresenter();
 render(new FilterView(filterList), tripControlsFilter);
 
 eventListPresenter.init(tripEventsBlock, pointsModel);
+

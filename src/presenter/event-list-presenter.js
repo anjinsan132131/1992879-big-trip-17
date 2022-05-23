@@ -15,6 +15,7 @@ export default class EventListPresenter {
 
   #currentSortType = SortType.DAY;
   #surcedPointList = [];
+  #offers = [];
 
   #eventListComponent = new EventListView();
   #sortComponent = new SortView(SortValue);
@@ -24,6 +25,7 @@ export default class EventListPresenter {
     this.#pointsModel = pointsModel;
     this.#pointList = [...this.#pointsModel.points];
     this.#surcedPointList = [...this.#pointsModel.points];
+    this.#offers = [...this.#pointsModel.offers];
 
     const listEmptyComponent = new ListEmptyView(FilterValue.Everything);
     if (!this.#pointList.length) {
@@ -35,7 +37,7 @@ export default class EventListPresenter {
     render(this.#eventListComponent, this.#eventListContainer);
 
     for (let i = 0; i < this.#pointList.length; i++) {
-      this.#renderPoint(this.#pointList[i]);
+      this.#renderPoint(this.#pointList[i], this.#offers);
     }
   };
 
@@ -68,7 +70,7 @@ export default class EventListPresenter {
 
     this.#sortPoints(sortType);
     this.#clearPointsList();
-    this.#renderListPoints(this.#pointList);
+    this.#renderListPoints(this.#pointList, this.#offers);
   };
 
   #renderSort = () => {
@@ -76,9 +78,9 @@ export default class EventListPresenter {
     this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
   };
 
-  #renderListPoints = (points) => {
+  #renderListPoints = (points, offers) => {
     for (let i = 0; i < points.length; i++) {
-      this.#renderPoint(points[i]);
+      this.#renderPoint(points[i], offers);
     }
   };
 
@@ -91,9 +93,9 @@ export default class EventListPresenter {
     this.#pointPresenter.forEach((presenter) => presenter.resetView());
   };
 
-  #renderPoint = (point) => {
+  #renderPoint = (point, offers) => {
     const pointPresenter = new PointPresenter(this.#eventListComponent.element, this.#handlePointChange, this.#handleModeChange);
-    pointPresenter.init(point);
+    pointPresenter.init(point, offers);
     this.#pointPresenter.set(point.id, pointPresenter);
     this.#renderSort();
     this.#renderListPoints(this.#pointsModel);

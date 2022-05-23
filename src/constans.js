@@ -64,4 +64,3 @@ export const EventMode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING',
 };
-

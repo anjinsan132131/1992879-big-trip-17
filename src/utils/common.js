@@ -39,3 +39,14 @@ export const updateItem = (items, update) => {
     ...items.slice(index + 1),
   ];
 };
+
+export const isEventRepeating = (type) => Object.values(type).some(Boolean);
+
+export const getOffersByCurrentType = ({type, offers}) => {
+
+  for (const offerItem of offers) {
+    if (offerItem.type === type) {
+      return {...offerItem};
+    }
+  }
+};

@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { POINT_TYPE, CITY_NAME, EventSelector } from '../constans.js';
-import { OFFERS_LIST } from '../mock/offers.js';
+import { getOffersByCurrentType } from '../utils/common.js';
 
 const createOfferPhotos = (photos) => photos.map(({src, description}) => (
   `<img class="event__photo" src="${src}" alt="${description}">`
@@ -34,7 +34,7 @@ const createOffers = (allOffersForType, currentOffersList) => allOffersForType.o
 }).join('');
 
 const createEventEditTemplate = (event) => {
-  const { destination, basePrice, dateFrom, dateTo, type, offers } = event;
+  const { destination, basePrice, dateFrom, dateTo, type, offers, allOffers } = event;
   const { description, pictures, name } = destination;
 
   const startDate = dayjs(dateFrom).format('D/MM/YY HH:mm');
@@ -44,7 +44,7 @@ const createEventEditTemplate = (event) => {
   const eventTypeList = createEventTypes();
   const eventCityList = createEventCity();
 
-  const allOffersForType = OFFERS_LIST.find((offer) => offer.type === type);
+  const allOffersForType = allOffers.find((offer) => offer.type === type);
   const offersList = createOffers(allOffersForType, offers);
 
   return (
@@ -126,16 +126,15 @@ const createEventEditTemplate = (event) => {
   );
 };
 
-export default class EventEditView extends AbstractView {
-  #event = null;
-
-  constructor(event) {
+export default class EventEditView extends AbstractStatefulView {
+  constructor(event, offers) {
     super();
-    this.#event = event;
+    this._state = EventEditView.parseEventToState(event, offers);
+    this.#subscribeOnEvents();
   }
 
   get template() {
-    return createEventEditTemplate(this.#event);
+    return createEventEditTemplate(this._state);
   }
 
   setEditClickHandler = (callback) => {
@@ -148,13 +147,53 @@ export default class EventEditView extends AbstractView {
     this.element.querySelector(`.${EventSelector.EDIT}`).addEventListener('submit', this.#formSubmitHandler);
   };
 
-  #editClickHandler = (evt) => {
-    evt.preventDefault();
+  #editClickHandler = (event) => {
+    event.preventDefault();
     this._callback.editClick();
   };
 
-  #formSubmitHandler = (evt) => {
-    evt.preventDefault();
-    this._callback.formSubmit();
+  #formSubmitHandler = (event) => {
+    event.preventDefault();
+    this._callback.formSubmit(EventEditView.parseStateToEvent(this._state));
+  };
+
+  _restoreHandlers = () => {
+    this.#subscribeOnEvents();
+    this.setEditClickHandler(this._callback.editClick);
+    this.setFormSubmitHandler(this._callback.formSubmit);
+  };
+
+  #subscribeOnEvents = () => {
+    this.element.querySelector('.event__type-list').addEventListener('change', this.#changeTypeClickHandler);
+  };
+
+  #changeTypeClickHandler = (event) => {
+    event.preventDefault();
+
+    const type = event.target.value;
+
+    const offers = getOffersByCurrentType({
+      type,
+      offers: this._state.allOffers
+    }).offers;
+
+    this.updateElement({
+      type,
+      offers,
+    });
+  };
+
+  static parseEventToState = (event, offers) => ({
+    ...event,
+    allOffers: offers,
+  });
+
+  static parseStateToEvent = (state) => {
+    console.log('state', state);
+    const event = {...state};
+
+    delete event.allOffers;
+
+    return event;
   };
 }

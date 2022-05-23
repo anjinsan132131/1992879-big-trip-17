@@ -68,18 +68,12 @@ export default class EventListPresenter {
 
     this.#sortPoints(sortType);
     this.#clearPointsList();
-    this.#renderListPoints(this.#pointList);
+    this.#pointList.forEach((point) => this.#renderPoint(point));
   };
 
   #renderSort = () => {
     render(this.#sortComponent, this.#eventListContainer, RenderPosition.AFTERBEGIN);
     this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
-  };
-
-  #renderListPoints = (points) => {
-    for (let i = 0; i < points.length; i++) {
-      this.#renderPoint(points[i]);
-    }
   };
 
   #clearPointsList = () => {
@@ -96,6 +90,5 @@ export default class EventListPresenter {
     pointPresenter.init(point);
     this.#pointPresenter.set(point.id, pointPresenter);
     this.#renderSort();
-    this.#renderListPoints(this.#pointsModel);
   };
 }

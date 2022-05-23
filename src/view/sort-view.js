@@ -2,8 +2,9 @@ import AbstractView from '../framework/view/abstract-view.js';
 
 const createSortItemTemplate = (sortValue, isChecked)=> (
   `<div class="trip-sort__item  trip-sort__item--${sortValue}">
-      <input id="sort-${sortValue}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${sortValue}" ${isChecked ? 'checked' : ''}/>
-      <label class="trip-sort__btn" for="sort-${sortValue}" data-sort-type="${sortValue}">${sortValue}</label>
+      <input id="sort-${sortValue}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${sortValue}"
+      ${isChecked ? 'checked' : ''} data-sort-type="${sortValue}"/>
+      <label class="trip-sort__btn" for="sort-${sortValue}">${sortValue}</label>
     </div>`
 );
 
@@ -28,4 +29,14 @@ export default class SortView  extends AbstractView {
   get template() {
     return createSortTemplate(this.#sorts);
   }
+
+  setSortTypeChangeHandler = (callback) => {
+    this._callback.sortTypeChange = callback;
+    this.element.addEventListener('change', this.#sortTypeChangeHandler);
+  };
+
+  #sortTypeChangeHandler = (event) => {
+    event.preventDefault();
+    this._callback.sortTypeChange(event.target.dataset.sortType);
+  };
 }

@@ -1,4 +1,4 @@
-import { getRandomInteger, getRandomArrayElement } from '../util.js';
+import { getRandomInteger, getRandomArrayElement } from '../utils/common.js';
 import { CITY_NAME, DESCRIPTION_TEXT, PHOTO_ADRESS, POINT_TYPE } from '../constans.js';
 
 const MIN_PRICE_VALUE = 1;

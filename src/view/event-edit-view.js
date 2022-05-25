@@ -33,14 +33,22 @@ const createOffers = (allOffersForType, currentOffersList) => allOffersForType.o
   );
 }).join('');
 
-const createEventEditTemplate = (event) => {
-  const { destination, basePrice, dateFrom, dateTo, type, offers, allOffers } = event;
-  const { description, pictures, name } = destination;
+const createEventEditTemplate = (state, allOffers) => {
+  const {
+    destinationName,
+    destinationDescription,
+    destinationPhotos,
+    basePrice,
+    dateFrom,
+    dateTo,
+    type,
+    offers
+  } = state;
 
   const startDate = dayjs(dateFrom).format('D/MM/YY HH:mm');
   const endDate = dayjs(dateTo).format('D/MM/YY HH:mm');
 
-  const photoList = createOfferPhotos(pictures);
+  const photoList = createOfferPhotos(destinationPhotos);
   const eventTypeList = createEventTypes();
   const eventCityList = createEventCity();
 
@@ -70,7 +78,7 @@ const createEventEditTemplate = (event) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationName}" list="destination-list-1">
           <datalist id="destination-list-1">
             ${eventCityList}
           </datalist>
@@ -108,11 +116,11 @@ const createEventEditTemplate = (event) => {
       </section>` : ''}
 
 
-      ${description.length > 0 ?
+      ${destinationDescription.length > 0 ?
       `<section class="event__details">
         <section class="event__section  event__section--destination">
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">${description}</p>
+          <p class="event__destination-description">${destinationDescription}</p>
           ${photoList.length > 0 ?
       ` <div class="event__photos-container">
             <div class="event__photos-tape">
@@ -127,29 +135,35 @@ const createEventEditTemplate = (event) => {
 };
 
 export default class EventEditView extends AbstractStatefulView {
-  constructor(event, offers) {
+  #allOffers = null;
+  #destinations = null;
+
+  constructor(event, offers, destinations) {
     super();
-    this._state = EventEditView.parseEventToState(event, offers);
-    this.#subscribeOnEvents();
+    this._state = EventEditView.parseEventToState(event);
+    this.#allOffers = offers;
+    this.#destinations = destinations;
+    this.#setInnerHandlers();
   }
 
   get template() {
-    return createEventEditTemplate(this._state);
+    return createEventEditTemplate(this._state, this.#allOffers);
   }
+
+  reset = (event) => {
+    this.updateElement(
+      EventEditView.parseEventToState(event)
+    );
+  };
 
   setEditClickHandler = (callback) => {
     this._callback.editClick = callback;
-    this.element.querySelector(`.${EventSelector.ROLLUP}`).addEventListener('click', this.#editClickHandler);
+    this.element.querySelector(`.${EventSelector.ROLLUP}`).addEventListener('click', this._callback.editClick);
   };
 
   setFormSubmitHandler = (callback) => {
     this._callback.formSubmit = callback;
     this.element.querySelector(`.${EventSelector.EDIT}`).addEventListener('submit', this.#formSubmitHandler);
-  };
-
-  #editClickHandler = (event) => {
-    event.preventDefault();
-    this._callback.editClick();
   };
 
   #formSubmitHandler = (event) => {
@@ -158,13 +172,14 @@ export default class EventEditView extends AbstractStatefulView {
   };
 
   _restoreHandlers = () => {
-    this.#subscribeOnEvents();
+    this.#setInnerHandlers();
     this.setEditClickHandler(this._callback.editClick);
     this.setFormSubmitHandler(this._callback.formSubmit);
   };
 
-  #subscribeOnEvents = () => {
+  #setInnerHandlers = () => {
     this.element.querySelector('.event__type-list').addEventListener('change', this.#changeTypeClickHandler);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeCityClickHandler);
   };
 
   #changeTypeClickHandler = (event) => {
@@ -174,7 +189,7 @@ export default class EventEditView extends AbstractStatefulView {
 
     const offers = getOffersByCurrentType({
       type,
-      offers: this._state.allOffers
+      offers: this.#allOffers
     }).offers;
 
     this.updateElement({
@@ -183,16 +198,34 @@ export default class EventEditView extends AbstractStatefulView {
     });
   };
 
-  static parseEventToState = (event, offers) => ({
+  #changeCityClickHandler = (event) => {
+    event.preventDefault();
+    const cityValue = event.target.value;
+    const destination = this.#destinations.find((element) => element.name === cityValue);
+    this.updateElement({
+      destinationName: destination ? destination.name : '',
+      destinationDescription: destination ? destination.description : '',
+      destinationPhotos: destination ? [...destination.pictures] : [],
+    });
+  };
+
+  static parseEventToState = (event) => ({
     ...event,
-    allOffers: offers,
+    destinationName: event.destination ? event.destination.name : '',
+    destinationDescription: event.destination ? event.destination.description : '',
+    destinationPhotos: event.destination ? [...event.destination.pictures] : [],
   });
 
   static parseStateToEvent = (state) => {
-    console.log('state', state);
     const event = {...state};
 
-    delete event.allOffers;
+    event.destination.name = event.destinationName;
+    event.destination.description = event.destinationDescription;
+    event.destination.pictures = [...event.destinationPhotos];
+
+    delete event.destinationName;
+    delete event.destinationDescription;
+    delete event.destinationPhotos;
 
     return event;
   };

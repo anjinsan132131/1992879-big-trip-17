@@ -5,7 +5,6 @@ import { EventMode } from '../constans.js';
 
 export default class PointPresenter {
   #point = null;
-  #offers = null;
   #pointComponent = null;
   #eventEditComponent = null;
   #eventListContainer = null;
@@ -19,20 +18,18 @@ export default class PointPresenter {
     this.#changeMode = changeMode;
   }
 
-  init = (point, offers) => {
+  init = (point, offers, destinations) => {
     this.#point = point;
-    this.#offers = offers;
-
     const prevPointComponent = this.#pointComponent;
     const prevPointEditComponent = this.#eventEditComponent;
 
     this.#pointComponent = new EventItemView(point, offers);
-    this.#eventEditComponent = new EventEditView(point, offers);
+    this.#eventEditComponent = new EventEditView(point, offers, destinations);
 
     this.#pointComponent.setClickHandler(this.#replacePointToEventEdit);
     this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
     this.#eventEditComponent.setFormSubmitHandler(this.#replaceEventEditToPoint);
-    this.#eventEditComponent.setEditClickHandler(this.#replaceEventEditToPoint);
+    this.#eventEditComponent.setEditClickHandler(this.#handleClick);
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this.#pointComponent, this.#eventListContainer);
@@ -58,6 +55,7 @@ export default class PointPresenter {
 
   resetView = () => {
     if (this.#mode !== EventMode.DEFAULT) {
+      this.#eventEditComponent.reset(this.#point);
       this.#replaceEventEditToPoint();
     }
   };
@@ -78,6 +76,7 @@ export default class PointPresenter {
   #onEscKeyDown = (event) => {
     if (event.key === 'Escape' || event.key === 'Esc') {
       event.preventDefault();
+      this.#eventEditComponent.reset(this.#point);
       this.#replaceEventEditToPoint();
       document.removeEventListener('keydown', this.#onEscKeyDown);
     }
@@ -85,5 +84,10 @@ export default class PointPresenter {
 
   #handleFavoriteClick = () => {
     this.#changeData({...this.#point, isFavorite: !this.#point.isFavorite});
+  };
+
+  #handleClick = () => {
+    this.#eventEditComponent.reset(this.#point);
+    this.#replaceEventEditToPoint();
   };
 }

@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { POINT_TYPE, CITY_NAME, EventSelector } from '../constans.js';
-import { OFFERS_LIST } from '../mock/offers.js';
+import { getOffersByCurrentType } from '../utils/common.js';
 
 const createOfferPhotos = (photos) => photos.map(({src, description}) => (
   `<img class="event__photo" src="${src}" alt="${description}">`
@@ -33,18 +33,26 @@ const createOffers = (allOffersForType, currentOffersList) => allOffersForType.o
   );
 }).join('');
 
-const createEventEditTemplate = (event) => {
-  const { destination, basePrice, dateFrom, dateTo, type, offers } = event;
-  const { description, pictures, name } = destination;
+const createEventEditTemplate = (state, allOffers) => {
+  const {
+    destinationName,
+    destinationDescription,
+    destinationPhotos,
+    basePrice,
+    dateFrom,
+    dateTo,
+    type,
+    offers
+  } = state;
 
   const startDate = dayjs(dateFrom).format('D/MM/YY HH:mm');
   const endDate = dayjs(dateTo).format('D/MM/YY HH:mm');
 
-  const photoList = createOfferPhotos(pictures);
+  const photoList = createOfferPhotos(destinationPhotos);
   const eventTypeList = createEventTypes();
   const eventCityList = createEventCity();
 
-  const allOffersForType = OFFERS_LIST.find((offer) => offer.type === type);
+  const allOffersForType = allOffers.find((offer) => offer.type === type);
   const offersList = createOffers(allOffersForType, offers);
 
   return (
@@ -70,7 +78,7 @@ const createEventEditTemplate = (event) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationName}" list="destination-list-1">
           <datalist id="destination-list-1">
             ${eventCityList}
           </datalist>
@@ -108,11 +116,11 @@ const createEventEditTemplate = (event) => {
       </section>` : ''}
 
 
-      ${description.length > 0 ?
+      ${destinationDescription.length > 0 ?
       `<section class="event__details">
         <section class="event__section  event__section--destination">
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">${description}</p>
+          <p class="event__destination-description">${destinationDescription}</p>
           ${photoList.length > 0 ?
       ` <div class="event__photos-container">
             <div class="event__photos-tape">
@@ -126,21 +134,31 @@ const createEventEditTemplate = (event) => {
   );
 };
 
-export default class EventEditView extends AbstractView {
-  #event = null;
+export default class EventEditView extends AbstractStatefulView {
+  #allOffers = null;
+  #destinations = null;
 
-  constructor(event) {
+  constructor(event, offers, destinations) {
     super();
-    this.#event = event;
+    this._state = EventEditView.parseEventToState(event);
+    this.#allOffers = offers;
+    this.#destinations = destinations;
+    this.#setInnerHandlers();
   }
 
   get template() {
-    return createEventEditTemplate(this.#event);
+    return createEventEditTemplate(this._state, this.#allOffers);
   }
+
+  reset = (event) => {
+    this.updateElement(
+      EventEditView.parseEventToState(event)
+    );
+  };
 
   setEditClickHandler = (callback) => {
     this._callback.editClick = callback;
-    this.element.querySelector(`.${EventSelector.ROLLUP}`).addEventListener('click', this.#editClickHandler);
+    this.element.querySelector(`.${EventSelector.ROLLUP}`).addEventListener('click', this._callback.editClick);
   };
 
   setFormSubmitHandler = (callback) => {
@@ -148,13 +166,67 @@ export default class EventEditView extends AbstractView {
     this.element.querySelector(`.${EventSelector.EDIT}`).addEventListener('submit', this.#formSubmitHandler);
   };
 
-  #editClickHandler = (evt) => {
-    evt.preventDefault();
-    this._callback.editClick();
+  #formSubmitHandler = (event) => {
+    event.preventDefault();
+    this._callback.formSubmit(EventEditView.parseStateToEvent(this._state));
   };
 
-  #formSubmitHandler = (evt) => {
-    evt.preventDefault();
-    this._callback.formSubmit();
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setEditClickHandler(this._callback.editClick);
+    this.setFormSubmitHandler(this._callback.formSubmit);
+  };
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.event__type-list').addEventListener('change', this.#changeTypeClickHandler);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeCityClickHandler);
+  };
+
+  #changeTypeClickHandler = (event) => {
+    event.preventDefault();
+
+    const type = event.target.value;
+
+    const offers = getOffersByCurrentType({
+      type,
+      offers: this.#allOffers
+    }).offers;
+
+    this.updateElement({
+      type,
+      offers,
+    });
+  };
+
+  #changeCityClickHandler = (event) => {
+    event.preventDefault();
+    const cityValue = event.target.value;
+    const destination = this.#destinations.find((element) => element.name === cityValue);
+    this.updateElement({
+      destinationName: destination ? destination.name : '',
+      destinationDescription: destination ? destination.description : '',
+      destinationPhotos: destination ? [...destination.pictures] : [],
+    });
+  };
+
+  static parseEventToState = (event) => ({
+    ...event,
+    destinationName: event.destination ? event.destination.name : '',
+    destinationDescription: event.destination ? event.destination.description : '',
+    destinationPhotos: event.destination ? [...event.destination.pictures] : [],
+  });
+
+  static parseStateToEvent = (state) => {
+    const event = {...state};
+
+    event.destination.name = event.destinationName;
+    event.destination.description = event.destinationDescription;
+    event.destination.pictures = [...event.destinationPhotos];
+
+    delete event.destinationName;
+    delete event.destinationDescription;
+    delete event.destinationPhotos;
+
+    return event;
   };
 }

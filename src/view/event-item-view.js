@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import AbstractView from '../framework/view/abstract-view.js';
 import { getDurationTime } from '../utils/common.js';
-import { OFFERS_LIST } from '../mock/offers.js';
 import { EventSelector } from '../constans.js';
 
 const createOffers = (offers) => offers.map(({title, price}) => (
@@ -10,9 +9,7 @@ const createOffers = (offers) => offers.map(({title, price}) => (
     </li>`
 )).join('');
 
-const createEventItemTemplate = (event) => {
-
-
+const createEventItemTemplate = (event, offersByType) => {
   const { basePrice, type, isFavorite, destination, offers, dateFrom, dateTo } = event;
   const { name } = destination;
 
@@ -20,7 +17,7 @@ const createEventItemTemplate = (event) => {
     ? 'event__favorite-btn--active'
     : '';
 
-  const offersList = OFFERS_LIST.find((offer) => offer.type === type).offers.filter(({id}) => offers.includes(id));
+  const offersList = offersByType.find((offer) => offer.type === type).offers.filter(({id}) => offers.includes(id));
   const servicesList = createOffers(offersList);
 
   const startDate = dayjs(dateFrom).format('MMM D');
@@ -67,14 +64,16 @@ const createEventItemTemplate = (event) => {
 
 export default class EventItemView extends AbstractView {
   #event = null;
+  #offers = null;
 
-  constructor(event) {
+  constructor(event, offers) {
     super();
     this.#event = event;
+    this.#offers = offers;
   }
 
   get template() {
-    return createEventItemTemplate(this.#event);
+    return createEventItemTemplate(this.#event, this.#offers);
   }
 
   setClickHandler = (callback) => {

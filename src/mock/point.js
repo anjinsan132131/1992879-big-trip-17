@@ -1,10 +1,8 @@
 import { getRandomInteger, getRandomArrayElement } from '../utils/common.js';
-import { CITY_NAME, DESCRIPTION_TEXT, PHOTO_ADRESS, POINT_TYPE } from '../constans.js';
+import { CITY_NAME, DESCRIPTION_TEXT, PHOTO_ADRESS, POINT_TYPE, MIN_PHOTO_VALUE, MAX_PHOTO_VALUE } from '../constans.js';
 
 const MIN_PRICE_VALUE = 1;
 const MAX_PRICE_VALUE = 2000;
-const MIN_PHOTO_VALUE = 1;
-const MAX_PHOTO_VALUE = 10;
 
 export const generatePoint = () => {
   const pointType = getRandomArrayElement(POINT_TYPE);
@@ -29,3 +27,4 @@ export const generatePoint = () => {
     type: pointType
   };
 };
+

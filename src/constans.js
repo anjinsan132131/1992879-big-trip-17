@@ -65,3 +65,5 @@ export const EventMode = {
   EDITING: 'EDITING',
 };
 
+export const MIN_PHOTO_VALUE = 1;
+export const MAX_PHOTO_VALUE = 10;

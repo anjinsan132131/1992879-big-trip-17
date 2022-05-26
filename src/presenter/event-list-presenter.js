@@ -15,6 +15,8 @@ export default class EventListPresenter {
 
   #currentSortType = SortType.DAY;
   #surcedPointList = [];
+  #offers = [];
+  #destinations = [];
 
   #eventListComponent = new EventListView();
   #sortComponent = new SortView(SortValue);
@@ -24,6 +26,8 @@ export default class EventListPresenter {
     this.#pointsModel = pointsModel;
     this.#pointList = [...this.#pointsModel.points];
     this.#surcedPointList = [...this.#pointsModel.points];
+    this.#offers = [...this.#pointsModel.offers];
+    this.#destinations = [...this.#pointsModel.destinations];
 
     const listEmptyComponent = new ListEmptyView(FilterValue.Everything);
     if (!this.#pointList.length) {
@@ -35,7 +39,7 @@ export default class EventListPresenter {
     render(this.#eventListComponent, this.#eventListContainer);
 
     for (let i = 0; i < this.#pointList.length; i++) {
-      this.#renderPoint(this.#pointList[i]);
+      this.#renderPoint(this.#pointList[i], this.#offers, this.#destinations);
     }
   };
 
@@ -68,7 +72,7 @@ export default class EventListPresenter {
 
     this.#sortPoints(sortType);
     this.#clearPointsList();
-    this.#pointList.forEach((point) => this.#renderPoint(point));
+    this.#pointList.forEach((point) => this.#renderPoint(point, this.#offers, this.#destinations));
   };
 
   #renderSort = () => {
@@ -85,9 +89,9 @@ export default class EventListPresenter {
     this.#pointPresenter.forEach((presenter) => presenter.resetView());
   };
 
-  #renderPoint = (point) => {
+  #renderPoint = (point, offers, destinations) => {
     const pointPresenter = new PointPresenter(this.#eventListComponent.element, this.#handlePointChange, this.#handleModeChange);
-    pointPresenter.init(point);
+    pointPresenter.init(point, offers, destinations);
     this.#pointPresenter.set(point.id, pointPresenter);
     this.#renderSort();
   };

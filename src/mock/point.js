@@ -3,14 +3,28 @@ import { CITY_NAME, DESCRIPTION_TEXT, PHOTO_ADRESS, POINT_TYPE, MIN_PHOTO_VALUE,
 
 const MIN_PRICE_VALUE = 1;
 const MAX_PRICE_VALUE = 2000;
+const dataArray = [
+  {
+    start: '2019-07-10T22:55:56.845Z',
+    end: '2019-07-11T11:22:13.375Z'
+  },
+  {
+    start: '2019-07-10T22:58:56.845Z',
+    end: '2019-07-11T11:46:13.375Z'
+  },
+  {
+    start: '2019-07-10T22:59:56.845Z',
+    end: '2019-07-11T11:58:13.375Z'
+  },
+];
 
-export const generatePoint = () => {
+export const generatePoint = (index) => {
   const pointType = getRandomArrayElement(POINT_TYPE);
 
   return {
     basePrice: getRandomInteger(MIN_PRICE_VALUE, MAX_PRICE_VALUE),
-    dateFrom: '2019-07-10T22:55:56.845Z',
-    dateTo: '2019-07-11T11:22:13.375Z',
+    dateFrom: dataArray[index].start,
+    dateTo: dataArray[index].end,
     destination: {
       description: getRandomArrayElement(DESCRIPTION_TEXT),
       name: getRandomArrayElement(CITY_NAME),

@@ -1,10 +1,25 @@
 import dayjs from 'dayjs';
+import he from 'he';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { POINT_TYPE, CITY_NAME, EventSelector } from '../constans.js';
 import { getOffersByCurrentType } from '../utils/common.js';
 import flatpickr from 'flatpickr';
-
 import 'flatpickr/dist/flatpickr.min.css';
+
+const NEW_EVENT = {
+  basePrice: '',
+  dateFrom: new Date(),
+  dateTo: new Date(),
+  destination: {
+    description: '',
+    name: '',
+    pictures: []
+  },
+  id: null,
+  isFavorite: false,
+  offers: [],
+  type: POINT_TYPE[0],
+};
 
 const createOfferPhotos = (photos) => photos.map(({src, description}) => (
   `<img class="event__photo" src="${src}" alt="${description}">`
@@ -81,7 +96,7 @@ const createEventEditTemplate = (state, allOffers) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinationName}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destinationName)}" list="destination-list-1">
           <datalist id="destination-list-1">
             ${eventCityList}
           </datalist>
@@ -100,7 +115,7 @@ const createEventEditTemplate = (state, allOffers) => {
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -140,9 +155,10 @@ const createEventEditTemplate = (state, allOffers) => {
 export default class EventEditView extends AbstractStatefulView {
   #allOffers = null;
   #destinations = null;
-  #datepicker = null;
+  #startDatePicker = null;
+  #endDatePicker = null;
 
-  constructor(event, offers, destinations) {
+  constructor(offers, destinations, event = NEW_EVENT) {
     super();
     this._state = EventEditView.parseEventToState(event);
     this.#allOffers = offers;
@@ -159,9 +175,14 @@ export default class EventEditView extends AbstractStatefulView {
   removeElement = () => {
     super.removeElement();
 
-    if (this.#datepicker) {
-      this.#datepicker.destroy();
-      this.#datepicker = null;
+    if (this.#startDatePicker) {
+      this.#startDatePicker.destroy();
+      this.#startDatePicker = null;
+    }
+
+    if (this.#endDatePicker) {
+      this.#endDatePicker.destroy();
+      this.#endDatePicker = null;
     }
   };
 
@@ -184,32 +205,30 @@ export default class EventEditView extends AbstractStatefulView {
   };
 
   #setDateFromDatepicker = () => {
-    if (this._state.dateFrom) {
-      this.#datepicker = flatpickr(
-        this.element.querySelector('.event__input--time-start'),
-        {
-          enableTime: true,
-          dateFormat: 'd/m/y H:i',
-          defaultDate: this._state.dateFrom,
-          onChange: this.#dateFromChangeHandler
-        }
-      );
-    }
+    this.#startDatePicker = flatpickr(
+      this.element.querySelector('.event__input--time-start'),
+      {
+        enableTime: true,
+        'time_24hr': true,
+        dateFormat: 'd/m/y H:i',
+        defaultDate: this._state.dateFrom,
+        onChange: this.#dateFromChangeHandler
+      }
+    );
   };
 
   #setDateToDatepicker = () => {
-    if (this._state.dateTo) {
-      this.#datepicker = flatpickr(
-        this.element.querySelector('.event__input--time-end'),
-        {
-          enableTime: true,
-          dateFormat: 'd/m/y H:i',
-          minDate: this._state.dateFrom,
-          defaultDate: this._state.dateTo,
-          onChange: this.#dateToChangeHandler
-        }
-      );
-    }
+    this.#endDatePicker = flatpickr(
+      this.element.querySelector('.event__input--time-end'),
+      {
+        enableTime: true,
+        'time_24hr': true,
+        dateFormat: 'd/m/y H:i',
+        defaultDate: this._state.dateTo,
+        minDate: this._state.dateFrom,
+        onChange: this.#dateToChangeHandler
+      }
+    );
   };
 
   setEditClickHandler = (callback) => {
@@ -222,6 +241,17 @@ export default class EventEditView extends AbstractStatefulView {
     this.element.querySelector(`.${EventSelector.EDIT}`).addEventListener('submit', this.#formSubmitHandler);
   };
 
+  setDeleteClickHandler = (callback) => {
+    this._callback.deleteClick = callback;
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
+  };
+
+  #formDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.deleteClick(EventEditView.parseStateToEvent(this._state));
+  };
+
+
   #formSubmitHandler = (event) => {
     event.preventDefault();
     this._callback.formSubmit(EventEditView.parseStateToEvent(this._state));
@@ -233,6 +263,7 @@ export default class EventEditView extends AbstractStatefulView {
     this.#setDateToDatepicker();
     this.setEditClickHandler(this._callback.editClick);
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
   };
 
   #setInnerHandlers = () => {
@@ -269,9 +300,9 @@ export default class EventEditView extends AbstractStatefulView {
 
   static parseEventToState = (event) => ({
     ...event,
-    destinationName: event.destination ? event.destination.name : '',
-    destinationDescription: event.destination ? event.destination.description : '',
-    destinationPhotos: event.destination ? [...event.destination.pictures] : [],
+    destinationName: event.destination.name ? event.destination.name : '',
+    destinationDescription: event.destination.description ? event.destination.description : '',
+    destinationPhotos: event.destination.pictures ? [...event.destination.pictures] : [],
   });
 
   static parseStateToEvent = (state) => {

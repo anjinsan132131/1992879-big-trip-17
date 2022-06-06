@@ -1,20 +1,17 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import { FilterValue } from '../constans.js';
 
-const createFilterItemTemplate = (filter, currentFilterType) => {
-  const { type, name } = filter;
-
-  return (
-    `<div class="trip-filters__filter">
-    <input id="filter-${name.toLowerCase()}" class="trip-filters__filter-input  visually-hidden" type="radio"
-    ${type === currentFilterType ? 'checked' : ''}
-      name="trip-filter" value="${name.toLowerCase()}">
-    <label class="trip-filters__filter-label" for="filter-${name.toLowerCase()}">${name}</label>
+const createFilterItemTemplate = (filter, currentFilterType) => (
+  `<div class="trip-filters__filter">
+    <input id="filter-${filter}" class="trip-filters__filter-input  visually-hidden" type="radio"
+    ${filter === currentFilterType ? 'checked' : ''}
+      name="trip-filter" value="${filter}">
+    <label class="trip-filters__filter-label" for="filter-${filter}">${filter}</label>
   </div>`
-  );
-};
+);
 
-const createFilterTemplate = (filterItems, currentFilterType) => {
-  const filterItemsTemplate = filterItems
+const createFilterTemplate = (currentFilterType) => {
+  const filterItemsTemplate = Object.keys(FilterValue)
     .map((filter) => createFilterItemTemplate(filter, currentFilterType))
     .join('');
 
@@ -24,17 +21,15 @@ const createFilterTemplate = (filterItems, currentFilterType) => {
 };
 
 export default class FilterView extends AbstractView  {
-  #filters = null;
   #currentFilter = null;
 
-  constructor(filters, currentFilterType) {
+  constructor(currentFilterType) {
     super();
-    this.#filters = filters;
     this.#currentFilter = currentFilterType;
   }
 
   get template() {
-    return createFilterTemplate(this.#filters, this.#currentFilter);
+    return createFilterTemplate(this.#currentFilter);
   }
 
   setFilterTypeChangeHandler = (callback) => {
@@ -44,7 +39,7 @@ export default class FilterView extends AbstractView  {
 
   #filterTypeChangeHandler = (evt) => {
     evt.preventDefault();
-    this._callback.filterTypeChange(evt.target.value);
+    this._callback.filterTypeChange((evt.target.value).toLowerCase());
   };
 
 }

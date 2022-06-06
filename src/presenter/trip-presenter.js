@@ -77,7 +77,7 @@ export default class TripPresenter {
         this.#pointsModel.addPoint(updateType, update);
         break;
       case UserAction.DELETE_POINT:
-        this.#pointsModel.deletePoint(updateType, update);
+        this.#pointsModel.deletePoint(updateType, update.id);
         break;
     }
   };
@@ -93,7 +93,7 @@ export default class TripPresenter {
         break;
       case UpdateType.MAJOR:
         this.#clearTrip();
-        this.#renderTrip(true);
+        this.#renderTrip();
         break;
     }
   };

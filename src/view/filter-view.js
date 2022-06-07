@@ -1,15 +1,18 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import { FilterValue } from '../constans.js';
 
-const createFilterItemTemplate = (filterValue) => (
+const createFilterItemTemplate = (filter, currentFilterType) => (
   `<div class="trip-filters__filter">
-    <input id="filter-${filterValue.toLowerCase()}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${filterValue.toLowerCase()}">
-    <label class="trip-filters__filter-label" for="filter-${filterValue.toLowerCase()}">${filterValue}</label>
+    <input id="filter-${filter}" class="trip-filters__filter-input  visually-hidden" type="radio"
+    ${filter === currentFilterType ? 'checked' : ''}
+      name="trip-filter" value="${filter}">
+    <label class="trip-filters__filter-label" for="filter-${filter}">${filter}</label>
   </div>`
 );
 
-const createFilterTemplate = (filterItems) => {
-  const filterItemsTemplate = filterItems
-    .map((filter) => createFilterItemTemplate(filter))
+const createFilterTemplate = (currentFilterType) => {
+  const filterItemsTemplate = Object.keys(FilterValue)
+    .map((filter) => createFilterItemTemplate(filter, currentFilterType))
     .join('');
 
   return `<form class="trip-filters" action="#" method="get">
@@ -18,14 +21,25 @@ const createFilterTemplate = (filterItems) => {
 };
 
 export default class FilterView extends AbstractView  {
-  #filters = null;
+  #currentFilter = null;
 
-  constructor(filters) {
+  constructor(currentFilterType) {
     super();
-    this.#filters = filters;
+    this.#currentFilter = currentFilterType;
   }
 
   get template() {
-    return createFilterTemplate(this.#filters);
+    return createFilterTemplate(this.#currentFilter);
   }
+
+  setFilterTypeChangeHandler = (callback) => {
+    this._callback.filterTypeChange = callback;
+    this.element.addEventListener('change', this.#filterTypeChangeHandler);
+  };
+
+  #filterTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.filterTypeChange((evt.target.value).toLowerCase());
+  };
+
 }

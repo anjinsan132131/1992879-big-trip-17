@@ -1,6 +1,6 @@
 import { render, replace, remove } from '../framework/render.js';
 import { EventEditView, EventItemView } from '../view';
-import { EventMode } from '../constans.js';
+import { EventMode, UserAction, UpdateType } from '../constans.js';
 
 
 export default class PointPresenter {
@@ -24,7 +24,7 @@ export default class PointPresenter {
     const prevPointEditComponent = this.#eventEditComponent;
 
     this.#pointComponent = new EventItemView(point, offers);
-    this.#eventEditComponent = new EventEditView(point, offers, destinations);
+    this.#eventEditComponent = new EventEditView(offers, destinations, point);
 
     this.#pointComponent.setClickHandler(this.#replacePointToEventEdit);
     this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
@@ -83,11 +83,23 @@ export default class PointPresenter {
   };
 
   #handleFavoriteClick = () => {
-    this.#changeData({...this.#point, isFavorite: !this.#point.isFavorite});
+    this.#changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      {...this.#point, isFavorite: !this.#point.isFavorite},
+    );
   };
 
   #handleClick = () => {
     this.#eventEditComponent.reset(this.#point);
     this.#replaceEventEditToPoint();
+  };
+
+  #handleDeleteClick = (point) => {
+    this.#changeData(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
   };
 }

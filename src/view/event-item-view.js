@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import AbstractView from '../framework/view/abstract-view.js';
 import { getDurationTime } from '../utils/common.js';
 import { EventSelector } from '../constans.js';
+import he from 'he';
 
 const createOffers = (offers) => offers.map(({title, price}) => (
   `<li class="event__offer">
@@ -32,7 +33,7 @@ const createEventItemTemplate = (event, offersByType) => {
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${type} ${name}</h3>
+      <h3 class="event__title">${type} ${he.encode(name)}</h3>
       <div class="event__schedule">
         <p class="event__time">
           <time class="event__start-time" datetime="${dateFrom}">${timeStart}</time>

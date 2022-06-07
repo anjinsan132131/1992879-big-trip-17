@@ -46,9 +46,9 @@ export const ListEmptyMessages = {
 };
 
 export const FilterValue = {
-  Everything: 'Everything',
-  Past: 'Past',
-  Future: 'Future'
+  Everything: 'everything',
+  Past: 'past',
+  Future: 'future'
 };
 
 export const SortValue = ['day', 'event', 'time', 'price', 'offers'];
@@ -62,8 +62,22 @@ export const SortType = {
 
 export const EventMode = {
   DEFAULT: 'DEFAULT',
-  EDITING: 'EDITING',
+  EDITING: 'EDITING'
 };
+
+export const DisabledSortValue = ['event', 'offers'];
 
 export const MIN_PHOTO_VALUE = 1;
 export const MAX_PHOTO_VALUE = 10;
+
+export const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  ADD_POINT: 'ADD_POINT',
+  DELETE_POINT: 'DELETE_POINT'
+};
+
+export const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR'
+};

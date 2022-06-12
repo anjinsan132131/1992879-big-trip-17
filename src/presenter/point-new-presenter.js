@@ -1,8 +1,6 @@
 import { render, remove, RenderPosition } from '../framework/render.js';
 import { EventEditView } from '../view';
 import { UserAction, UpdateType } from '../constans.js';
-import {nanoid} from 'nanoid';
-
 
 export default class PointNewPresenter {
   #destinations = null;
@@ -42,21 +40,39 @@ export default class PointNewPresenter {
       return;
     }
 
-    this.#destroyCallback?.();
-
     remove(this.#eventEditComponent);
     this.#eventEditComponent = null;
 
+    this.#destroyCallback?.();
+
     document.addEventListener('keydown', this.#onEscKeyDown);
+  };
+
+  setSaving = () => {
+    this.#eventEditComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  };
+
+  setAborting = () => {
+    const resetFormState = () => {
+      this.#eventEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#eventEditComponent.shake(resetFormState);
   };
 
   #handleFormSubmit = (point) => {
     this.#changeData(
       UserAction.ADD_POINT,
       UpdateType.MAJOR,
-      {id: nanoid(), ...point},
+      point,
     );
-    this.destroy();
   };
 
   #onEscKeyDown = (event) => {

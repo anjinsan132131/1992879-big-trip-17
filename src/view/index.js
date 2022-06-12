@@ -6,3 +6,4 @@ export { default as EventItemView } from './event-item-view.js';
 export { default as EventListView } from './event-list-view.js';
 export { default as ListEmptyView } from  './list-empty-view.js';
 export { default as NewPointButtonView } from './new-point-button-view.js';
+export { default as LoadingView } from './loading-view.js';

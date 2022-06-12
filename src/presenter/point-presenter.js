@@ -28,8 +28,9 @@ export default class PointPresenter {
 
     this.#pointComponent.setClickHandler(this.#replacePointToEventEdit);
     this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
-    this.#eventEditComponent.setFormSubmitHandler(this.#replaceEventEditToPoint);
+    this.#eventEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#eventEditComponent.setEditClickHandler(this.#handleClick);
+    this.#eventEditComponent.setDeleteClickHandler(this.#handleDeleteClick);
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this.#pointComponent, this.#eventListContainer);
@@ -41,7 +42,8 @@ export default class PointPresenter {
     }
 
     if (this.#mode === EventMode.EDITING) {
-      replace(this.#eventEditComponent, prevPointEditComponent);
+      replace(this.#pointComponent, prevPointEditComponent);
+      this.#mode = EventMode.DEFAULT;
     }
 
     remove(prevPointComponent);
@@ -51,6 +53,10 @@ export default class PointPresenter {
   destroy = () => {
     remove(this.#pointComponent);
     remove(this.#eventEditComponent);
+    this.#pointComponent = null;
+    this.#eventEditComponent = null;
+
+    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
   resetView = () => {
@@ -58,6 +64,41 @@ export default class PointPresenter {
       this.#eventEditComponent.reset(this.#point);
       this.#replaceEventEditToPoint();
     }
+  };
+
+  setSaving = () => {
+    if (this.#mode === EventMode.EDITING) {
+      this.#eventEditComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  };
+
+  setDeleting = () => {
+    if (this.#mode === EventMode.EDITING) {
+      this.#eventEditComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  };
+
+  setAborting = () => {
+    if (this.#mode === EventMode.DEFAULT) {
+      this.#pointComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#eventEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#eventEditComponent.shake(resetFormState);
   };
 
   #replacePointToEventEdit = () => {
@@ -87,6 +128,14 @@ export default class PointPresenter {
       UserAction.UPDATE_POINT,
       UpdateType.MINOR,
       {...this.#point, isFavorite: !this.#point.isFavorite},
+    );
+  };
+
+  #handleFormSubmit = (updatedPoint) => {
+    this.#changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      updatedPoint,
     );
   };
 

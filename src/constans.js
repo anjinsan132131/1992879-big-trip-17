@@ -78,7 +78,6 @@ export const UserAction = {
 
 export const UpdateType = {
   PATCH: 'PATCH',
-  MINOR: 'MINOR',
   MAJOR: 'MAJOR',
   INIT: 'INIT'
 };
@@ -87,3 +86,9 @@ export const UiBlockerTimeLimit = {
   LOWER_LIMIT: 350,
   UPPER_LIMIT: 1000,
 };
+
+export const SpecialSymbols = {
+  DASH:  '&mdash;',
+  SPACE: '&nbsp;'
+};
+

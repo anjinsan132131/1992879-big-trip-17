@@ -3,39 +3,40 @@ import AbstractView from '../framework/view/abstract-view.js';
 import { SpecialSymbols } from '../constans.js';
 
 const getTripTitle = (points) => {
+  const [firstPoint, secondPoint, thirdPoint] = points;
+
   switch (points.length) {
     case 1:
-      return [points[0].destination.name];
+      return [firstPoint.destination.name];
     case 2:
-      return [`${points[0].destination.name} ${SpecialSymbols.DASH} ${points[1].destination.name}`];
+      return [`${firstPoint.destination.name} ${SpecialSymbols.DASH} ${secondPoint.destination.name}`];
     case 3:
-      return [`${points[0].destination.name} ${SpecialSymbols.DASH} ${points[1].destination.name} ${SpecialSymbols.DASH} ${points[2].destination.name}`];
+      return [`${firstPoint.destination.name} ${SpecialSymbols.DASH} ${secondPoint.destination.name} ${SpecialSymbols.DASH} ${thirdPoint.destination.name}`];
     default:
-      return [`${points[0].destination.name} ${SpecialSymbols.DASH} ... ${SpecialSymbols.DASH} ${points[points.length - 1].destination.name}`];
+      return [`${firstPoint.destination.name} ${SpecialSymbols.DASH} ... ${SpecialSymbols.DASH} ${points[points.length - 1].destination.name}`];
   }
 };
 
-const getTripDates = (points) => `${dayjs(points[0].dateFrom).format('DD MMM')}${SpecialSymbols.SPACE}${SpecialSymbols.DASH}${SpecialSymbols.SPACE}${dayjs(points[points.length - 1].dateTo).format('DD MMM')}`;
+const getTripDates = (points) => {
+  const dateFrom = dayjs(points[0].dateFrom).format('DD MMM');
+  const dateTo = dayjs(points[points.length - 1].dateTo).format('DD MMM');
+  const specialSybmols = `${SpecialSymbols.SPACE}${SpecialSymbols.DASH}${SpecialSymbols.SPACE}`;
 
-const getOffersCost = (points, offersData) => {
-  const pointsOffersPrice = [];
-
-  for(const point of points) {
-    const offerIndex = offersData.findIndex((item) => item.type === point.type);
-    const pointOffers = offersData[offerIndex].offers;
-    const targetOffers = pointOffers.filter((item) => point.offers.some((el) => item.id === el));
-    targetOffers.forEach((item) => pointsOffersPrice.push(item.price));
-  }
-
-  const offersCost = pointsOffersPrice.reduce((acc, price) => acc + price, 0);
-  return offersCost;
+  return `${dateFrom}${specialSybmols}${dateTo}`;
 };
 
 const getTripCost = (points, offers) => {
-  const basePriceCosts = points.reduce((sum, point) => sum + Number(point.basePrice), 0);
-  const offersCost = getOffersCost(points, offers);
+  let totalCost = 0;
 
-  return basePriceCosts + offersCost;
+  points.forEach((point) => {
+    const offerIndex = offers.findIndex((item) => item.type === point.type);
+    const pointOffers = offers[offerIndex].offers;
+    const targetOffers = pointOffers.filter((item) => point.offers.some((offer) => item.id === offer));
+
+    totalCost += point.basePrice + targetOffers.reduce((total, offer) => total + offer.price, 0);
+  });
+
+  return totalCost;
 };
 
 const createInfoTemplate = (points, offers) => (

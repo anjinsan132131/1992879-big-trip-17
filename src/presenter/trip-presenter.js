@@ -23,7 +23,7 @@ export default class TripPresenter {
 
   #loadingComponent = new LoadingView();
   #eventListComponent = new EventListView();
-  #infoComponent = new InfoView();
+  #infoComponent = null;
   #listEmptyComponent = null;
   #sortComponent = null;
   #isLoading = true;
@@ -110,10 +110,6 @@ export default class TripPresenter {
       case UpdateType.PATCH:
         this.#pointPresenterMap.get(data.id).init(data);
         break;
-      case UpdateType.MINOR:
-        this.#clearPointList();
-        this.#renderPoints();
-        break;
       case UpdateType.MAJOR:
         this.#clearTrip();
         this.#renderTrip();
@@ -134,6 +130,7 @@ export default class TripPresenter {
     this.#currentSortType = sortType;
     this.#clearPointList();
     this.#renderPoints();
+    this.#renderTripInfo();
   };
 
   #clearPointList = () => {
@@ -147,6 +144,7 @@ export default class TripPresenter {
 
     remove(this.#sortComponent);
     remove(this.#listEmptyComponent);
+    remove(this.#infoComponent);
     remove(this.#infoComponent);
 
     if (resetSortType) {
@@ -173,9 +171,14 @@ export default class TripPresenter {
       return;
     }
 
+    this.#renderTripInfo();
     render(this.#infoComponent, tripMainBlock, RenderPosition.AFTERBEGIN);
     this.#renderSort();
     this.#renderPoints();
+  };
+
+  #renderTripInfo = () => {
+    this.#infoComponent = new InfoView(this.#pointsModel.points, this.#pointsModel.offers);
   };
 
   #renderPoints = () => {

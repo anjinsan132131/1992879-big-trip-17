@@ -31,7 +31,7 @@ export default class FilterPresenter {
   init = () => {
     const prevFilterComponent = this.#filterComponent;
 
-    this.#filterComponent = new FilterView(this.#filterModel.filter, this.filtersCount);
+    this.#filterComponent = new FilterView(this.#filterModel.filterType, this.filtersCount);
     this.#filterComponent.setFilterTypeChangeHandler(this.#handleFilterTypeChange);
 
     if (prevFilterComponent === null) {
@@ -48,10 +48,10 @@ export default class FilterPresenter {
   };
 
   #handleFilterTypeChange = (filterType) => {
-    if (this.#filterModel.filter === filterType) {
+    if (this.#filterModel.filterType === filterType) {
       return;
     }
 
-    this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
+    this.#filterModel.setFilterType(UpdateType.MAJOR, filterType);
   };
 }

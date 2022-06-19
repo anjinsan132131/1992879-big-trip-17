@@ -1,9 +1,3 @@
-export const CITY_NAME = [
-  'Chamonix',
-  'Amsterdam',
-  'Geneva'
-];
-
 export const POINT_TYPE = [
   'taxi',
   'bus',

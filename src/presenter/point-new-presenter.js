@@ -1,5 +1,5 @@
 import { render, remove, RenderPosition } from '../framework/render.js';
-import { EventEditView } from '../view';
+import { EventEditView, ServerErrorMessageView } from '../view';
 import { UserAction, UpdateType } from '../constans.js';
 
 export default class PointNewPresenter {
@@ -9,6 +9,7 @@ export default class PointNewPresenter {
   #eventListContainer = null;
   #changeData = null;
   #destroyCallback = null;
+  #errorMessageBlock = null;
 
 
   constructor(eventListContainer, changeData, destinations, offers) {
@@ -25,14 +26,20 @@ export default class PointNewPresenter {
       return;
     }
 
-    this.#eventEditComponent = new EventEditView(this.#offers, this.#destinations);
+    if (!this.#offers.length && !this.#destinations.length) {
+      this.#errorMessageBlock = new ServerErrorMessageView();
+      render(this.#errorMessageBlock, this.#eventListContainer, RenderPosition.AFTERBEGIN);
+    } else {
+      this.#eventEditComponent = new EventEditView(this.#offers, this.#destinations);
 
-    this.#eventEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
-    this.#eventEditComponent.setDeleteClickHandler(this.#handleDeleteClick);
+      this.#eventEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
+      this.#eventEditComponent.setDeleteClickHandler(this.#handleDeleteClick);
+      this.#eventEditComponent.setEditClickHandler(this.#handleDeleteClick);
 
-    render(this.#eventEditComponent, this.#eventListContainer, RenderPosition.AFTERBEGIN);
+      render(this.#eventEditComponent, this.#eventListContainer, RenderPosition.AFTERBEGIN);
 
-    document.addEventListener('keydown', this.#onEscKeyDown);
+      document.addEventListener('keydown', this.#onEscKeyDown);
+    }
   };
 
   destroy = () => {

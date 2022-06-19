@@ -39,7 +39,7 @@ export default class TripPresenter {
   }
 
   get points() {
-    const filterType = this.#filterModel.filter;
+    const filterType = this.#filterModel.filterType;
     const points = this.#pointsModel.points;
     this.#offers = this.#pointsModel.offers;
     this.#destinations = this.#pointsModel.destinations;
@@ -63,7 +63,8 @@ export default class TripPresenter {
 
   createPoint = (callback) => {
     this.#currentSortType = SortType.DAY;
-    this.#filterModel.setFilter(UpdateType.MAJOR, FilterValue.Everything);
+    this.#filterModel.setFilterType(UpdateType.MAJOR, FilterValue.Everything);
+    remove(this.#listEmptyComponent);
     this.#pointNewPresenter.init(callback);
   };
 
@@ -130,7 +131,6 @@ export default class TripPresenter {
     this.#currentSortType = sortType;
     this.#clearPointList();
     this.#renderPoints();
-    this.#renderTripInfo();
   };
 
   #clearPointList = () => {
@@ -144,7 +144,6 @@ export default class TripPresenter {
 
     remove(this.#sortComponent);
     remove(this.#listEmptyComponent);
-    remove(this.#infoComponent);
     remove(this.#infoComponent);
 
     if (resetSortType) {
@@ -192,7 +191,7 @@ export default class TripPresenter {
   };
 
   #renderEmptyList = () => {
-    this.#listEmptyComponent = new ListEmptyView(this.#filterModel.filter);
+    this.#listEmptyComponent = new ListEmptyView(this.#filterModel.filterType);
     render(this.#listEmptyComponent, this.#eventListContainer);
   };
 

@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import he from 'he';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { POINT_TYPE, CITY_NAME, EventSelector } from '../constans.js';
+import { POINT_TYPE, EventSelector } from '../constans.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -31,7 +31,7 @@ const createEventTypes = () => POINT_TYPE.map((type) => (
   </div>`
 )).join('');
 
-const createEventCity = () => CITY_NAME.map((city) => (
+const createEventCity = (cityList) => cityList.map((city) => (
   `<option value="${city}"></option>`
 )).join('');
 
@@ -50,7 +50,7 @@ const createOffers = (allOffersForType, currentOffersList, isDisabled) => allOff
   );
 }).join('');
 
-const createEventEditTemplate = (state, allOffers) => {
+const createEventEditTemplate = (state, allOffers, destinations) => {
   const {
     destinationName,
     destinationDescription,
@@ -70,8 +70,9 @@ const createEventEditTemplate = (state, allOffers) => {
   const isSubmitDisabled = !basePrice || !startDate || !endDate || !type || !destinationName;
 
   const photoList = createOfferPhotos(destinationPhotos);
+  const cityList = destinations.map(({name}) => name);
   const eventTypeList = createEventTypes();
-  const eventCityList = createEventCity();
+  const eventCityList = createEventCity(cityList);
 
   const allOffersForType = allOffers.find((offer) => offer.type === type);
   const offersList = createOffers(allOffersForType, offers);
@@ -171,7 +172,7 @@ export default class EventEditView extends AbstractStatefulView {
   }
 
   get template() {
-    return createEventEditTemplate(this._state, this.#allOffers);
+    return createEventEditTemplate(this._state, this.#allOffers, this.#destinations);
   }
 
   removeElement = () => {
@@ -300,7 +301,7 @@ export default class EventEditView extends AbstractStatefulView {
   };
 
   #priceChangeClickHandler = (event) => {
-    let newPrice = Math.round(event.target.value);
+    let newPrice = Math.abs(Math.round(event.target.value));
 
     if (isNaN(newPrice)) {
       newPrice = '';
@@ -318,13 +319,7 @@ export default class EventEditView extends AbstractStatefulView {
 
     const oldOfferIds = [...this._state.offers];
 
-    let newOfferIds;
-
-    if (isChecked) {
-      newOfferIds = [...oldOfferIds, newOfferId];
-    } else {
-      newOfferIds = oldOfferIds.filter((offerId) => offerId !== newOfferId);
-    }
+    const newOfferIds = isChecked ? [...oldOfferIds, newOfferId]: oldOfferIds.filter((offerId) => offerId !== newOfferId);
 
     this.updateElement({
       offers: newOfferIds,

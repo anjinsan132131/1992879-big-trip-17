@@ -5,7 +5,7 @@ import { NewPointButtonView } from './view';
 import {render} from './framework/render.js';
 import PointsApiService from './points-api-service.js';
 
-const AUTHORIZATION = 'Basic a81qwer2906njji1';
+const AUTHORIZATION = 'Basic a81qwer2906nji1';
 const END_POINT = 'https://17.ecmascript.pages.academy/big-trip';
 
 const tripControlsFilter = document.querySelector('.trip-controls__filters');
